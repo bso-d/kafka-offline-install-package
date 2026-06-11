@@ -1,0 +1,2 @@
+dist/*.tar.gz filter=lfs diff=lfs merge=lfs -text
+dist/*.sha256 filter=lfs diff=lfs merge=lfs -text

@@ -6,8 +6,7 @@ kraft/.env
 # reference files not needed in repo
 docker-compose-ref.yml
 
-# built bundles and saved docker images
-dist/
+# saved docker images and offline packages (too large, build locally)
 images/
 docker-offline/
 security-reports/
