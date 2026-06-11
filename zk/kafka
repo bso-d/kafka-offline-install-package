@@ -531,9 +531,8 @@ cmd_lag() {
   else
     # ── Summary view: all groups ──────────────────────────────────────────────
     sep
-    printf "${BOLD}  Consumer Group Lag Summary"
-    [[ -n "$topic" ]] && printf "  (topic: %s)" "$topic"
-    printf "${RESET}\n"
+    echo -e "${BOLD}  Consumer Group Lag Summary${RESET}"
+    [[ -n "$topic" ]] && echo -e "  Topic filter: ${topic}"
     sep
     echo ""
 

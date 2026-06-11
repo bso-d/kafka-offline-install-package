@@ -132,9 +132,9 @@ build_bundle() {
   # ── Optionally include Docker offline packages ──
   if $INCLUDE_DOCKER; then
     local deb_dir="$SCRIPT_DIR/docker-offline"
-    if [[ -d "$deb_dir" ]] && ls "$deb_dir"/*.deb &>/dev/null 2>&1; then
+    if [[ -d "$deb_dir" ]] && find "$deb_dir" -name "*.deb" -maxdepth 1 | grep -q .; then
       cp -r "$deb_dir" "$bundle_dir/docker-offline"
-      ok "docker-offline/ ($(ls "$deb_dir"/*.deb | wc -l | xargs) packages)"
+      ok "docker-offline/ ($(find "$deb_dir" -name "*.deb" -maxdepth 1 | wc -l | xargs) packages)"
     else
       warn "docker-offline/ has no .deb files — skipping Docker packages."
       warn "Run ./download-docker-debs.sh first, then rebuild with --include-docker."

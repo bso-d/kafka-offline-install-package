@@ -7,3 +7,5 @@ kraft/.env
 dist/
 images/
 docker-offline/
+security-reports/
+.DS_Store
