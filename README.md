@@ -62,14 +62,36 @@ dist/
 
 ## Installing on the VM
 
+Pre-built bundles are available on the [Releases](https://github.com/bso-d/kafka-offline-install-package/releases/latest) page.
+
+**Step 1 — Download the bundle (on the VM or transfer manually)**
+
 ```bash
-# Verify the bundle
-sha256sum -c kafka-zk-bundle-YYYYMMDD.tar.gz.sha256
+# ZooKeeper variant
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-bundle-20260611.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-bundle-20260611.tar.gz.sha256
 
-# Extract and install
-tar -xzf kafka-zk-bundle-YYYYMMDD.tar.gz
-cd kafka-zk-bundle-YYYYMMDD
+# KRaft variant
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-bundle-20260611.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-bundle-20260611.tar.gz.sha256
+```
 
+**Step 2 — Verify integrity**
+
+```bash
+sha256sum -c kafka-zk-bundle-20260611.tar.gz.sha256
+```
+
+**Step 3 — Extract**
+
+```bash
+tar -xzf kafka-zk-bundle-20260611.tar.gz
+cd kafka-zk-bundle-20260611
+```
+
+**Step 4 — Install**
+
+```bash
 ./kafka docker-check       # verify Docker is ready
 ./kafka docker-install     # only if Docker isn't working (needs --include-docker bundle)
 ./kafka install            # load images → configure → start cluster
