@@ -52,10 +52,10 @@ Output lands in `dist/`:
 
 ```
 dist/
-├── kafka-zk-v2.tar.gz
-├── kafka-zk-v2.tar.gz.sha256
-├── kafka-kraft-v2.tar.gz
-└── kafka-kraft-v2.tar.gz.sha256
+├── kafka-zk-v3.tar.gz
+├── kafka-zk-v3.tar.gz.sha256
+├── kafka-kraft-v3.tar.gz
+└── kafka-kraft-v3.tar.gz.sha256
 ```
 
 > KRaft bundle (~700 MB) is smaller than ZK (~1.1 GB) since it doesn't need the ZooKeeper image.
@@ -70,25 +70,25 @@ Pre-built bundles are available on the [Releases](https://github.com/bso-d/kafka
 
 ```bash
 # ZooKeeper variant
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v2.tar.gz
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v2.tar.gz.sha256
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v3.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v3.tar.gz.sha256
 
 # KRaft variant
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v2.tar.gz
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v2.tar.gz.sha256
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v3.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v3.tar.gz.sha256
 ```
 
 **Step 2 — Verify integrity**
 
 ```bash
-sha256sum -c kafka-zk-v2.tar.gz.sha256
+sha256sum -c kafka-zk-v3.tar.gz.sha256
 ```
 
 **Step 3 — Extract**
 
 ```bash
-tar -xzf kafka-zk-v2.tar.gz
-cd kafka-zk-v2
+tar -xzf kafka-zk-v3.tar.gz
+cd kafka-zk-v3
 ```
 
 **Step 4 — Install**
