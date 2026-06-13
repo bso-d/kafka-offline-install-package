@@ -11,6 +11,8 @@ Two variants — choose based on your coordination layer preference:
 
 Both include 4 brokers, 24 partitions per topic, and [Kafbat UI](https://github.com/kafbat/kafka-ui) for cluster visibility.
 
+**Requirements:** Docker Engine ≥25.0.3 and Docker Compose ≥1.29.2 (`docker compose` plugin or standalone `docker-compose`)
+
 ---
 
 ## Quick Start (online machine)
@@ -202,11 +204,11 @@ kafka config set KAFKA_UI_PASSWORD=yourpassword
 
 ## Offline Docker Install
 
-If Docker is not installed or not working on the VM, build a bundle that includes Docker CE packages:
+If Docker is not installed or not working on the VM, build a bundle that includes Docker CE packages (installs Docker Engine 29.5.3 + Compose plugin 5.1.4):
 
 ```bash
 # On the connected machine (downloads ARM64 .deb packages via Docker)
-./download-docker-debs.sh --ubuntu-version noble   # Ubuntu 24.04 (target)
+./download-docker-debs.sh --ubuntu-version noble   # Ubuntu 24.04
 
 ./make-bundle.sh --no-pull --include-docker
 ```
@@ -217,6 +219,8 @@ On the VM:
 ./kafka docker-install   # installs containerd, docker-ce, docker-compose-plugin
 ./kafka install
 ```
+
+If Docker ≥25.0.3 is already installed with the legacy `docker-compose` (v1 ≥1.29.2), `kafka install` will use it automatically — no reinstall needed.
 
 ---
 

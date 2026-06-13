@@ -45,11 +45,13 @@ ZK_IMAGES=(
   "confluentinc/cp-zookeeper:7.6.1"
   "confluentinc/cp-kafka:7.6.1"
   "kafbat/kafka-ui:latest"
+  "nginx:1.27-alpine"
 )
 
 KRAFT_IMAGES=(
   "confluentinc/cp-kafka:7.6.1"
   "kafbat/kafka-ui:latest"
+  "nginx:1.27-alpine"
 )
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -121,6 +123,9 @@ build_bundle() {
 
   cp "$src_dir/docker-compose.yml" "$bundle_dir/docker-compose.yml"
   ok "docker-compose.yml"
+
+  cp "$src_dir/nginx.conf" "$bundle_dir/nginx.conf"
+  ok "nginx.conf"
 
   cp "$src_dir/kafka" "$bundle_dir/kafka"
   chmod +x "$bundle_dir/kafka"
