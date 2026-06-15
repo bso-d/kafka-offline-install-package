@@ -65,40 +65,46 @@ dist/
 
 ## Installing on the VM
 
-Pre-built bundles are available on the [Releases](https://github.com/bso-d/kafka-offline-install-package/releases/latest) page.
+The current [release](https://github.com/bso-d/kafka-offline-install-package/releases/latest) publishes the **ZooKeeper / amd64** bundle (`kafka-zk-v4-amd64.tar.gz`), for x86_64 Ubuntu VMs. Other variants/arches build from source — see [Other variants & architectures](#other-variants--architectures).
 
-**Step 1 — Pick the bundle for your VM's CPU** (`uname -m`: `x86_64` → `amd64`, `aarch64` → `arm64`), then download (on the VM or transfer manually). Examples use the `amd64` ZooKeeper bundle:
+### Install the ZooKeeper bundle (amd64)
+
+For an x86_64 VM (`uname -m` → `x86_64`):
 
 ```bash
-# ZooKeeper variant (amd64 — use -arm64 for ARM hosts)
+# 1 — Download (on the VM, or transfer manually)
 wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz
 wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz.sha256
 
-# KRaft variant
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v4-amd64.tar.gz
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-kraft-v4-amd64.tar.gz.sha256
-```
-
-**Step 2 — Verify integrity**
-
-```bash
+# 2 — Verify integrity
 sha256sum -c kafka-zk-v4-amd64.tar.gz.sha256
-```
 
-**Step 3 — Extract**
-
-```bash
+# 3 — Extract
 tar -xzf kafka-zk-v4-amd64.tar.gz
-cd kafka-zk-v4
-```
+cd kafka-zk-v4-amd64
 
-**Step 4 — Install**
-
-```bash
+# 4 — Install
+./kafka doctor             # preflight: ports, firewalld, Docker, architecture
 ./kafka docker-check       # verify Docker is ready
-./kafka docker-install     # only if Docker isn't working (needs --include-docker bundle)
+./kafka docker-install     # only if Docker isn't installed (bundle ships amd64 .debs)
 ./kafka install            # load images → configure → start cluster
 ```
+
+Then open Kafbat UI at `http://<vm-host>:8080` (credentials from `.env`; change them with `kafka config set`).
+
+> `kafka doctor` runs automatically at the start of `kafka install`, so a port conflict, a firewalld `docker`-zone issue, or an architecture mismatch is caught before anything starts.
+
+### Other variants & architectures
+
+The KRaft variant and arm64 builds aren't published in the current release, but build from source on a machine with Docker + internet:
+
+```bash
+./download-docker-debs.sh --ubuntu-version noble --arch arm64
+./make-bundle.sh --version v4 --arch arm64 --include-docker        # arm64 ZK + KRaft
+./make-bundle.sh --version v4 --arch amd64 --mode kraft --include-docker
+```
+
+See [Building Offline Bundles](#building-offline-bundles) for details.
 
 ---
 
