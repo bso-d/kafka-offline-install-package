@@ -151,7 +151,16 @@ get_published_ports() {
 get_fqdn() {
   local f
   f="$(env_value KAFKA_UI_FQDN)"
-  [[ -n "$f" ]] || f="$(hostname -f 2>/dev/null || hostname)"
+  if [[ -z "$f" ]]; then
+    # `hostname -f` does a resolver lookup that can hang on air-gapped hosts;
+    # cap it and fall back to the short hostname.
+    if command -v timeout &>/dev/null; then
+      f="$(timeout 2 hostname -f 2>/dev/null || true)"
+    else
+      f="$(hostname -f 2>/dev/null || true)"
+    fi
+    [[ -n "$f" ]] || f="$(hostname 2>/dev/null || true)"
+  fi
   echo "$f"
 }
 
@@ -284,6 +293,7 @@ cmd_stop() {
 # ─── restart ──────────────────────────────────────────────────────────────────
 cmd_restart() {
   require_compose; require_compose_file; require_env
+  ensure_cert   # proxy won't start without a TLS cert (e.g. after a cert swap)
   local svc="${1:-}"
   if [[ -n "$svc" ]]; then
     info "Restarting $svc..."
@@ -526,6 +536,15 @@ cmd_doctor() {
   else
     warn ".env missing — it will be created from template on 'kafka install'"
   fi
+  if [[ -f "$CERT_CRT" && -f "$CERT_KEY" ]]; then
+    ok "TLS certificate present"
+  elif command -v openssl &>/dev/null; then
+    ok "no TLS cert yet — will be generated with openssl on install"
+  else
+    err "no TLS cert and openssl not found — install/start will fail to generate one"
+    warn "Install openssl (e.g. apt-get install -y openssl) or drop a cert in certs/server.{crt,key}"
+    problems=$((problems + 1))
+  fi
   echo ""
 
   # ── Architecture match ──
@@ -584,7 +603,7 @@ cmd_doctor() {
     else
       warn "firewalld is active but has no 'docker' zone."
       warn "Docker can abort with: Failed to program NAT chain: INVALID_ZONE: docker"
-      warn "Fix: firewall-cmd --permanent --new-zone=docker && firewall-cmd --reload && systemctl restart docker"
+      warn "Fix: firewall-cmd --permanent --new-zone=docker && firewall-cmd --permanent --zone=docker --set-target=ACCEPT && firewall-cmd --reload && systemctl restart docker"
       problems=$((problems + 1))
     fi
   else
@@ -595,19 +614,24 @@ cmd_doctor() {
   # ── iptables backend consistency ──
   # If Docker's FORWARD rules end up in BOTH iptables-legacy and iptables-nft,
   # one stale layer's default-drop silently blocks container-to-container traffic.
+  # Listing iptables rules needs root, so report honestly when we can't inspect.
   info "iptables backend"
-  local legacy_docker=false nft_docker=false
-  if iptables-legacy -S FORWARD 2>/dev/null | grep -q 'DOCKER'; then legacy_docker=true; fi
-  if iptables-nft     -S FORWARD 2>/dev/null | grep -q 'DOCKER'; then nft_docker=true; fi
-  if $legacy_docker && $nft_docker; then
-    err "Docker FORWARD rules exist in BOTH iptables-legacy and iptables-nft (split-brain)."
-    err "Container networking can break. Align on one backend, e.g.:"
-    err "  update-alternatives --set iptables /usr/sbin/iptables-nft && systemctl restart docker"
-    problems=$((problems + 1))
+  if [[ "$(id -u)" != "0" ]]; then
+    warn "not root — skipped the legacy/nft split-brain check (re-run as root to verify)"
   else
-    local be
-    be="$(iptables -V 2>/dev/null | grep -oE 'legacy|nf_tables' || echo 'unknown')"
-    ok "single iptables backend in use ($be)"
+    local legacy_docker=false nft_docker=false
+    if iptables-legacy -S FORWARD 2>/dev/null | grep -q 'DOCKER'; then legacy_docker=true; fi
+    if iptables-nft     -S FORWARD 2>/dev/null | grep -q 'DOCKER'; then nft_docker=true; fi
+    if $legacy_docker && $nft_docker; then
+      err "Docker FORWARD rules exist in BOTH iptables-legacy and iptables-nft (split-brain)."
+      err "Container networking can break. Align on one backend, e.g.:"
+      err "  update-alternatives --set iptables /usr/sbin/iptables-nft && systemctl restart docker"
+      problems=$((problems + 1))
+    elif $legacy_docker || $nft_docker; then
+      ok "single iptables backend ($($legacy_docker && echo legacy || echo nf_tables))"
+    else
+      warn "no Docker FORWARD rules found in either backend — is Docker running? (couldn't verify)"
+    fi
   fi
   echo ""
 

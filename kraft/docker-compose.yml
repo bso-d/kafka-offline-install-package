@@ -198,6 +198,9 @@ services:
         max-file: "3"
     environment:
       AUTH_TYPE: "LOGIN_FORM"
+      # Honor X-Forwarded-* from the nginx TLS proxy so login redirects/cookies
+      # use https (not the internal http://...:8080).
+      SERVER_FORWARDHEADERSSTRATEGY: "framework"
       SPRING_SECURITY_USER_NAME: ${KAFKA_UI_USER}
       SPRING_SECURITY_USER_PASSWORD: ${KAFKA_UI_PASSWORD}
       KAFKA_CLUSTERS_0_NAME: cluster-1-kraft
