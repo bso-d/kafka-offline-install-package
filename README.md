@@ -53,10 +53,10 @@ Output lands in `dist/` (one set per arch):
 
 ```
 dist/
-├── kafka-zk-v4-amd64.tar.gz       (+ .sha256)
-├── kafka-kraft-v4-amd64.tar.gz    (+ .sha256)
-├── kafka-zk-v4-arm64.tar.gz       (+ .sha256)
-└── kafka-kraft-v4-arm64.tar.gz    (+ .sha256)
+├── kafka-zk-v5-amd64.tar.gz       (+ .sha256)
+├── kafka-kraft-v5-amd64.tar.gz    (+ .sha256)
+├── kafka-zk-v5-arm64.tar.gz       (+ .sha256)
+└── kafka-kraft-v5-arm64.tar.gz    (+ .sha256)
 ```
 
 > KRaft bundle (~720 MB) is smaller than ZK (~1.2 GB) since it doesn't need the ZooKeeper image.
@@ -66,7 +66,7 @@ dist/
 
 ## Installing on the VM
 
-The current [release](https://github.com/bso-d/kafka-offline-install-package/releases/latest) publishes the **ZooKeeper / amd64** bundle (`kafka-zk-v4-amd64.tar.gz`), for x86_64 Ubuntu VMs. Other variants/arches build from source — see [Other variants & architectures](#other-variants--architectures).
+The current [release](https://github.com/bso-d/kafka-offline-install-package/releases/latest) publishes the **ZooKeeper / amd64** bundle (`kafka-zk-v5-amd64.tar.gz`), for x86_64 Ubuntu VMs. Other variants/arches build from source — see [Other variants & architectures](#other-variants--architectures).
 
 ### Install the ZooKeeper bundle (amd64)
 
@@ -74,15 +74,15 @@ For an x86_64 VM (`uname -m` → `x86_64`):
 
 ```bash
 # 1 — Download (on the VM, or transfer manually)
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz.sha256
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v5-amd64.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v5-amd64.tar.gz.sha256
 
 # 2 — Verify integrity
-sha256sum -c kafka-zk-v4-amd64.tar.gz.sha256
+sha256sum -c kafka-zk-v5-amd64.tar.gz.sha256
 
 # 3 — Extract
-tar -xzf kafka-zk-v4-amd64.tar.gz
-cd kafka-zk-v4-amd64
+tar -xzf kafka-zk-v5-amd64.tar.gz
+cd kafka-zk-v5-amd64
 
 # 4 — Install
 ./kafka doctor             # preflight: ports, firewalld, Docker, architecture
@@ -101,8 +101,8 @@ The KRaft variant and arm64 builds aren't published in the current release, but 
 
 ```bash
 ./download-docker-debs.sh --ubuntu-version noble --arch arm64
-./make-bundle.sh --version v4 --arch arm64 --include-docker        # arm64 ZK + KRaft
-./make-bundle.sh --version v4 --arch amd64 --mode kraft --include-docker
+./make-bundle.sh --version v5 --arch arm64 --include-docker        # arm64 ZK + KRaft
+./make-bundle.sh --version v5 --arch amd64 --mode kraft --include-docker
 ```
 
 See [Building Offline Bundles](#building-offline-bundles) for details.
@@ -223,7 +223,7 @@ If Docker is not installed or not working on the VM, build a bundle that include
 # On the connected machine (downloads .deb packages for the target arch via Docker)
 ./download-docker-debs.sh --ubuntu-version noble --arch amd64   # or --arch arm64
 
-./make-bundle.sh --version v4 --arch amd64 --include-docker
+./make-bundle.sh --version v5 --arch amd64 --include-docker
 ```
 
 On the VM:

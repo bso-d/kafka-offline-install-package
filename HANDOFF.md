@@ -1,7 +1,7 @@
 # Kafka Offline Install Package — Handoff Document
 
 **Repo:** https://github.com/bso-d/kafka-offline-install-package  
-**Current release:** v1.0.0 — arch-suffixed bundles `kafka-{zk,kraft}-v4-{amd64,arm64}.tar.gz`  
+**Current release:** v1.0.0 — arch-suffixed bundles `kafka-{zk,kraft}-v5-{amd64,arm64}.tar.gz`  
 **Target VM:** Ubuntu 24.04 (noble), x86_64 or ARM64 — pick the matching bundle
 
 ---
@@ -14,8 +14,8 @@ Two variants are maintained in parallel under `zk/` and `kraft/`:
 
 | Variant | Coordination | Bundle |
 |---|---|---|
-| `zk` | Apache ZooKeeper (Confluent 7.6.1) | `kafka-zk-v4-<arch>.tar.gz` |
-| `kraft` | KRaft combined mode, no ZooKeeper | `kafka-kraft-v4-<arch>.tar.gz` |
+| `zk` | Apache ZooKeeper (Confluent 7.6.1) | `kafka-zk-v5-<arch>.tar.gz` |
+| `kraft` | KRaft combined mode, no ZooKeeper | `kafka-kraft-v5-<arch>.tar.gz` |
 
 Both ship 4 brokers (IDs 92–95), 24 partitions per topic, replication factor 3, and Kafbat UI behind an nginx reverse proxy.
 
@@ -208,14 +208,14 @@ Bundles are **per-architecture** (`amd64` / `arm64`). Build one set per target C
 ./download-docker-debs.sh --ubuntu-version noble --arch arm64
 
 # 2. Build both variants for each arch
-./make-bundle.sh --version v4 --arch arm64 --no-pull --include-docker   # arm64 host: local images
-./make-bundle.sh --version v4 --arch amd64 --include-docker             # pulls amd64 images
+./make-bundle.sh --version v5 --arch arm64 --no-pull --include-docker   # arm64 host: local images
+./make-bundle.sh --version v5 --arch amd64 --include-docker             # pulls amd64 images
 
 # Output:
-# dist/kafka-zk-v4-amd64.tar.gz     ~1.1 GB   (+ .sha256)
-# dist/kafka-kraft-v4-amd64.tar.gz  ~730 MB   (+ .sha256)
-# dist/kafka-zk-v4-arm64.tar.gz     ~1.1 GB   (+ .sha256)
-# dist/kafka-kraft-v4-arm64.tar.gz  ~720 MB   (+ .sha256)
+# dist/kafka-zk-v5-amd64.tar.gz     ~1.1 GB   (+ .sha256)
+# dist/kafka-kraft-v5-amd64.tar.gz  ~730 MB   (+ .sha256)
+# dist/kafka-zk-v5-arm64.tar.gz     ~1.1 GB   (+ .sha256)
+# dist/kafka-kraft-v5-arm64.tar.gz  ~720 MB   (+ .sha256)
 ```
 
 `--arch amd64|arm64` selects the target CPU (defaults to the build host's arch).  
@@ -228,7 +228,7 @@ Bundles are **per-architecture** (`amd64` / `arm64`). Build one set per target C
 ### What goes into each bundle
 
 ```
-kafka-zk-v4-<arch>/
+kafka-zk-v5-<arch>/
 ├── docker-compose.yml
 ├── nginx.conf
 ├── .env.template
@@ -252,10 +252,10 @@ kafka-zk-v4-<arch>/
 ```bash
 # Upload all four arch-suffixed bundles (+ sidecars)
 gh release upload v1.0.0 \
-  dist/kafka-zk-v4-amd64.tar.gz    dist/kafka-zk-v4-amd64.tar.gz.sha256 \
-  dist/kafka-kraft-v4-amd64.tar.gz dist/kafka-kraft-v4-amd64.tar.gz.sha256 \
-  dist/kafka-zk-v4-arm64.tar.gz    dist/kafka-zk-v4-arm64.tar.gz.sha256 \
-  dist/kafka-kraft-v4-arm64.tar.gz dist/kafka-kraft-v4-arm64.tar.gz.sha256 \
+  dist/kafka-zk-v5-amd64.tar.gz    dist/kafka-zk-v5-amd64.tar.gz.sha256 \
+  dist/kafka-kraft-v5-amd64.tar.gz dist/kafka-kraft-v5-amd64.tar.gz.sha256 \
+  dist/kafka-zk-v5-arm64.tar.gz    dist/kafka-zk-v5-arm64.tar.gz.sha256 \
+  dist/kafka-kraft-v5-arm64.tar.gz dist/kafka-kraft-v5-arm64.tar.gz.sha256 \
   --clobber
 
 # Remove previous (unsuffixed / older vN) assets
@@ -272,11 +272,11 @@ done
 ```bash
 # Pick the bundle for the VM's CPU: `uname -m` → x86_64 = amd64, aarch64 = arm64.
 # Example uses the amd64 ZooKeeper bundle.
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz
-wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v4-amd64.tar.gz.sha256
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v5-amd64.tar.gz
+wget https://github.com/bso-d/kafka-offline-install-package/releases/download/v1.0.0/kafka-zk-v5-amd64.tar.gz.sha256
 
 # Verify
-sha256sum -c kafka-zk-v4-amd64.tar.gz.sha256
+sha256sum -c kafka-zk-v5-amd64.tar.gz.sha256
 ```
 
 `sha256sum -c` works as-is from v4 onward — the sidecar now carries a bare
@@ -285,8 +285,8 @@ Known Issues #1 for the fix history.)
 
 ```bash
 # Extract (macOS xattrs warning is harmless on Linux)
-tar -xzf kafka-zk-v4-amd64.tar.gz
-cd kafka-zk-v4-amd64
+tar -xzf kafka-zk-v5-amd64.tar.gz
+cd kafka-zk-v5-amd64
 
 # Preflight (also catches an arch mismatch before install)
 ./kafka doctor
